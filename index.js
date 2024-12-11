@@ -1,14 +1,14 @@
-import eslint from "@eslint/js";
+import js from "@eslint/js";
 import perfectionist from "eslint-plugin-perfectionist";
-import tseslint from "typescript-eslint";
+import ts from "typescript-eslint";
 import svelte from "eslint-plugin-svelte";
 import globals from "globals";
 
 export default (env = "browser") =>
-  tseslint.config(
+  ts.config(
     { ignores: ["dist/", ".*/"] },
-    eslint.configs.recommended,
-    tseslint.configs.recommended,
+    js.configs.recommended,
+    ts.configs.recommended,
     ...svelte.configs["flat/recommended"],
     {
       rules: {
@@ -45,6 +45,23 @@ export default (env = "browser") =>
       },
     },
     {
-      languageOptions: { globals: { ...globals[env] } },
+      files: ["**/*.svelte"],
+      languageOptions: {
+        parserOptions: {
+          svelteFeatures: {
+            experimentalGenerics: true,
+          },
+        },
+      },
+    },
+    {
+      languageOptions: {
+        parserOptions: { parser: ts.parser },
+        globals: { ...globals[env] },
+      },
+    },
+    {
+      files: ["src/**/{*.server,+server}.{js,ts}"],
+      languageOptions: { globals: { ...globals.node } },
     }
   );
